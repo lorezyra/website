@@ -1,0 +1,77 @@
+{
+    "Version": "2012-10-17",
+    "Id": "s3-technocracy-works",
+    "Statement": [
+        {
+            "Sid": "AllowCloudFrontServicePrincipal",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::technocracy.works/*",
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceArn": "arn:aws:cloudfront::929020317704:distribution/E3UQOMJO4R85Y9"
+                }
+            }
+        },
+        {
+            "Sid": "AllowAccount",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:sts::929020317704:federated-user/s3am4n"
+            },
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::technocracy.works/*",
+                "arn:aws:s3:::technocracy.works"
+            ]
+        },
+        {
+            "Sid": "AllowCodePipelineAccess",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "codepipeline.amazonaws.com"
+            },
+            "Action": [
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": "arn:aws:s3:::technocracy.works/*",
+            "Condition": {
+                "StringEquals": {
+                    "AWS:SourceAccount": "929020317704"
+                },
+                "ArnLike": {
+                    "aws:SourceArn": "arn:aws:codepipeline:ap-northeast-1:929020317704:*"
+                }
+            }
+        },
+        {
+            "Sid": "DenyUnEncryptedObjectUploads",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::technocracy.works/*",
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": "aws:kms"
+                }
+            }
+        },
+        {
+            "Sid": "DenyInsecureConnections",
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::technocracy.works/*",
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "false"
+                }
+            }
+        }
+    ]
+  }
+  
